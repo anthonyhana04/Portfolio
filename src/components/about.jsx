@@ -25,22 +25,22 @@ const About = () => {
               About Me
             </h1>
             <h2 className="text-3xl font-normal text-gray-900 mb-2 md:text-2xl sm:text-xl">
-              Let me tell you a little about myself...
+              It's so nice to meet you!
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed mb-6 md:text-base sm:text-sm">
-              I'm a passionate developer who treats every “What if…?” as an invitation to build. 
-              Supported by my background in math and computer science, I enjoy bringing ideas to life and tackling real-world problems one solution at a time.
-              I’m always learning, always iterating, and always up for the next challenge, preferably with a good playlist and a room full of creative minds.
+              I’m Anthony, a software engineer passionate about building systems that are fast and reliable, but also intuitive and user-centered. 
+              With a curious mind and a love for learning and problem-solving, I aim to turn complex challenges into clean, scalable solutions. 
+              For me, great software makes technology feel personal, purposeful, and a little fun.
             </p>
             <p className="text-lg text-gray-600 leading-relaxed mb-6 md:text-base sm:text-sm">
-              As a multidisciplinary engineer, I thrive on tackling challenges that impact real people at scale. I leverage my passion for learning 
-              and diverse technical expertise to bring projects from prototype to production. Whether I’m working on a full-stack
-              web app, developing software, or integrating machine-learning features, I’m always driven by the opportunity to showcase my skills through innovation. 
+              A little fun fact about me is that I love to explore. Whether it’s spending hours on Google Maps virtually wandering through new cities or planning the perfect biking route around the city, 
+              I’m fascinated by how place shapes experience, even if I can’t always get there myself. That curiosity extends into my work too. Right now, 
+              I’m exploring the intersections software has with geography, recently building a real-time transit visualization tool that maps buses across Hamilton using GTFS data.
             </p>
             <p className="text-lg text-gray-600 leading-relaxed mb-0 md:text-base sm:text-sm">
-              During my experiences voluenteering or while working with clubs, and projects, I was fortunate enough to develop awesome 
-              software pertaining to machine learning, full-stack development, and software arcitecture. I worked with 
-              many great people in small and large teams, allowing me to learn from my mentors.
+              Along the way, I’ve had the opportunity to work with amazing teams through volunteering, clubs, and project-based work. 
+              These experiences allowed me to dive into areas like machine learning, full-stack development, and software architecture. 
+              Collaborating with others from small, tight-knit groups to larger cross-functional teams helped me grow both as an engineer and as a teammate.
             </p>
           </div>
           <div className="about-image flex justify-center md:justify-end order-1 md:order-2">
