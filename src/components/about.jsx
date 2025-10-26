@@ -33,9 +33,9 @@ const About = () => {
               For me, great software makes technology feel personal, purposeful, and a little fun.
             </p>
             <p className="text-lg text-gray-600 leading-relaxed mb-6 md:text-base sm:text-sm">
-              A little fun fact about me is that I love to explore. Whether it’s spending hours on Google Maps virtually wandering through new cities or planning the perfect biking route around the city, 
-              I’m fascinated by how place shapes experience, even if I can’t always get there myself. That curiosity extends into my work too. Right now, 
-              I’m exploring the intersections software has with geography, recently building a real-time transit visualization tool that maps buses across Hamilton using GTFS data.
+              A little fun fact about me is that I love to explore. Whether it's spending hours on Google Maps virtually wandering through new cities or planning the perfect biking route around the city, 
+              I'm fascinated by how place shapes experience, even if I can't always get there myself. That curiosity extends into my work too. Right now, 
+              I'm working at LTV.ai as an AI & ML Engineer, building high-throughput AI systems that power autonomous email marketing at scale.
             </p>
             <p className="text-lg text-gray-600 leading-relaxed mb-0 md:text-base sm:text-sm">
               Along the way, I’ve had the opportunity to work with amazing teams through volunteering, clubs, and project-based work. 

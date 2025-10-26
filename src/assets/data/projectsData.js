@@ -4,18 +4,18 @@ import assets from '../../utils/assets';
 export const projectsData = [
   {
     id: 1,
-    title: "MacPad",
-    description: "MacPad is a feather‑light, all‑native notepad designed exclusively for macOS. Built with SwiftUI for a seamless modern interface and AppKit under the hood for rock‑solid integration, MacPad delivers a refreshingly simple yet powerful writing experience",  
-    image: assets['macpad.jpg'],
+    title: "AI & ML Engineer",
+    description: "Engineering high-throughput AI systems for autonomous email marketing at LTV.ai. I implement & optimize LLM prompting strategies and implement response caching with async orchestration to scale email generation, while building analytics dashboards that power insights across high-volume client datasets.",
+    image: assets['ltvai-logo.jpg'],
     imagescale: "scale-100",
-    tech: ["Swift", "AppKit", "SwiftUI", "Swift Concurrency"],
-    githubUrl: "https://github.com/anthonyhana04/MacPad",
-    category: "Text Editor"
+    tech: ["TypeScript", "PostgreSQL", "AWS", "LLMOps"],
+    githubUrl: "https://ltv.ai/",
+    category: "Work Experience"
   },
   {
     id: 2,
     title: "Software Architect", 
-    description: "As Software Architect at McMaster Start Coding, I’ll design, build, and maintain internal engineering tools and workflows, establish coding standards and CI/CD pipelines, and plan and lead hands-on workshops to empower students and mentors.",
+    description: "As Software Architect at McMaster Start Coding, I'll design, build, and maintain internal engineering tools and workflows, establish coding standards and CI/CD pipelines, and plan and lead hands-on workshops to empower students and mentors.",
     image: assets['msclogo.jpg'],
     imagescale: "scale-10",
     tech: ["Elm", "Haskell", "Python", "PostgreSQL"],
@@ -23,12 +23,13 @@ export const projectsData = [
   },
   {
     id: 3,
-    title: "Portfolio",
-    description: "My portfolio is a sleek, single-page React site styled with Tailwind CSS that puts your projects and skills front and center. It features smooth scroll-in animations, interactive project previews, and a fully responsive layout for an engaging, polished browsing experience on any device.",
-    image: assets['portfolio.jpg'],
-    tech: ["React", "JavaScript", "Tailwind CSS", "HTML"],
-    githubUrl: "https://github.com/anthonyhana04/portfolio",
-    category: "Web App"
+    title: "MacPad",
+    description: "MacPad is a feather‑light, all‑native notepad designed exclusively for macOS. Built with SwiftUI for a seamless modern interface and AppKit under the hood for rock‑solid integration, MacPad delivers a refreshingly simple yet powerful writing experience",  
+    image: assets['macpad.jpg'],
+    imagescale: "scale-100",
+    tech: ["Swift", "AppKit", "SwiftUI", "Swift Concurrency"],
+    githubUrl: "https://github.com/anthonyhana04/MacPad",
+    category: "Text Editor"
   }
 ];
 

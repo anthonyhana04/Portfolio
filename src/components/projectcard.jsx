@@ -2,7 +2,7 @@ import React from 'react'
 import Icon from '../components/icon'
 
 const ProjectCard = ({ project, isReverse = false }) => {
-  const { id, title, description, image, tech, githubUrl, category } = project
+  const { id, title, description, image, tech, githubUrl, category, imagescale } = project
 
   return (
     <article
@@ -25,7 +25,7 @@ const ProjectCard = ({ project, isReverse = false }) => {
             <img
               src={image}
               alt={`${title} preview`}
-              className="w-115 rounded-xl shadow-xl border border-gray-200 transition-transform duration-300 hover:scale-105 md:w-109 sm:w-101"
+              className={`w-115 rounded-xl shadow-xl border border-gray-200 transition-transform duration-300 hover:scale-105 md:w-109 sm:w-101 ${id === 1 ? 'object-contain bg-white aspect-video' : ''}`}
             />
           </div>
         </div>
@@ -39,7 +39,7 @@ const ProjectCard = ({ project, isReverse = false }) => {
         </p>
         <div className="mb-8">
           <span className="block text-sm text-gray-500 font-medium uppercase tracking-wide mb-2">
-            {id === 2 ? 'Tools:' : 'Built with:'}
+            {id === 2 ? 'Tools:' : id === 1 ? 'Worked with:' : 'Built with:'}
           </span>
           <div className="flex flex-wrap gap-2">
             {tech.map((t, i) => (
@@ -62,6 +62,16 @@ const ProjectCard = ({ project, isReverse = false }) => {
             >
               <Icon name="arrowNE" size={20} />
               <span>McMaster Start Coding</span>
+            </a>
+          ) : id === 1 ? (
+            <a
+              href={githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-gray-900 hover:text-gray-700"
+            >
+              <Icon name="arrowNE" size={20} />
+              <span>Visit LTV.ai</span>
             </a>
           ) : (
             githubUrl && (
