@@ -1,8 +1,40 @@
 import React from 'react';
 import useFadeOnScroll from '../hooks/useFadeOnScroll';
 import assets from '../utils/assets';
+import { PROFILE_BG_ASCII } from '../assets/data/ascii';
+
+import { AirplaneIcon } from '../assets/data/icons';
 
 const About = () => {
+  const [isHovered, setIsHovered] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleMouseOver = (e) => {
+      const target = e.target;
+      const computedStyle = window.getComputedStyle(target);
+      const cursor = computedStyle.cursor;
+
+      const isInteractive =
+        target.tagName === 'A' ||
+        target.tagName === 'BUTTON' ||
+        target.closest('a') ||
+        target.closest('button') ||
+        cursor === 'pointer' ||
+        cursor === 'crosshair' ||
+        cursor === 'text' ||
+        cursor === 'help';
+
+      if (isInteractive) {
+        setIsHovered(true);
+      } else {
+        setIsHovered(false);
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseOver);
+    return () => window.removeEventListener('mousemove', handleMouseOver);
+  }, []);
+
   // data
   const educationData = {
     institution: "McMaster University",
@@ -23,20 +55,34 @@ const About = () => {
 
 
   return (
-    <section id="about" className="bg-white text-black py-24 font-mono border-t border-black">
-      <div className="container max-w-7xl mx-auto px-6">
+    <section id="about" className="bg-white text-black pt-24 pb-0 font-mono border-t border-black relative overflow-hidden">
+      {/* Background ASCII Art */}
+      <div className="absolute top-0 left-0 w-[150%] h-full pointer-events-none select-none opacity-[0.10] overflow-hidden flex flex-wrap content-start z-0">
+        {Array.from({ length: 150 }).map((_, i) => (
+          <pre key={i} className="text-[10px] leading-[1.0] font-mono whitespace-pre text-black">
+            {PROFILE_BG_ASCII}
+          </pre>
+        ))}
+      </div>
+
+      <div className="container max-w-7xl mx-auto px-6 relative z-10">
 
         {/* Header */}
-        <div className="mb-16 border-b border-black pb-6 fade-element">
-          <span className="text-xs tracking-widest uppercase mb-2 block text-gray-500">
-            01 // INTRODUCTION
-          </span>
-          <h2 className="text-5xl md:text-6xl font-bold tracking-tighter uppercase">
-            PROFILE<span className="hidden md:inline">_</span>LOG
-          </h2>
+        <div className="mb-16 border-b border-black pb-6 fade-element flex justify-between items-end">
+          <div>
+            <span className="font-crimson text-lg italic text-gray-500 mb-2 block">
+              01 - introduction
+            </span>
+            <h2 className="text-5xl md:text-6xl font-bold font-crimson lowercase tracking-tight">
+              profile<span className="hidden md:inline">_</span>log
+            </h2>
+          </div>
+          <div className="hidden md:block">
+            <AirplaneIcon isHovered={isHovered} />
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-l border-black">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-l border-black cursor-crosshair">
 
           {/* Photos / Visuals Column */}
           <div className="lg:col-span-5 border-r border-b border-black p-8 relative group fade-element">
@@ -74,8 +120,8 @@ const About = () => {
               {/* Decor */}
               <div className="absolute bottom-0 right-0 w-1 h-1 bg-black transition-colors duration-300 group-hover:bg-red-500"></div>
 
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white px-2 font-bold tracking-widest uppercase transition-colors duration-300 group-hover:bg-red-100">
-                PROFILE_DATA
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white px-2 font-bold tracking-widest transition-colors duration-300 group-hover:bg-red-100">
+                profile_data
               </span>
 
               <div className="flex flex-col gap-1 relative z-10">
@@ -156,13 +202,13 @@ const About = () => {
           <div className="lg:col-span-7 flex flex-col">
 
             {/* Bio Block */}
-            <div className="border-r border-b border-black p-8 md:p-12 fade-element group">
-              <h3 className="text-xl font-bold uppercase mb-6 flex items-center gap-4">
+            <div className="border-r border-b border-black p-8 md:p-12 fade-element group cursor-text">
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-4 font-mono lowercase">
                 {/* Single Geometric Symbol */}
-                <span className="font-mono text-2xl text-gray-200 transition-colors duration-300 group-hover:text-black select-none -translate-y-0.5">
-                  ◆
+                <span className="font-mono text-2xl text-gray-200 transition-colors duration-300 group-hover:text-black select-none -translate-y-0.5 cursor-help">
+                  ~
                 </span>
-                WHO_AM_I
+                it's so nice to meet you,
               </h3>
               <div className="text-sm md:text-base leading-relaxed opacity-80 space-y-6">
                 <p>
@@ -178,13 +224,13 @@ const About = () => {
             </div>
 
             {/* Education Block */}
-            <div className="border-r border-b border-black p-8 md:p-12 flex-grow fade-element group bg-white transition-colors duration-300">
-              <h3 className="text-xl font-bold uppercase mb-6 flex items-center gap-4">
+            <div className="border-r border-b border-black p-8 md:p-12 flex-grow fade-element group transition-colors duration-300">
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-4 font-mono lowercase">
                 {/* Advanced Geometric Symbol */}
-                <span className="font-mono text-2xl text-gray-200 transition-colors duration-300 group-hover:text-black select-none -translate-y-0.5">
-                  ◉
+                <span className="font-mono text-2xl text-gray-200 transition-colors duration-300 group-hover:text-black select-none -translate-y-0.5 cursor-help">
+                  ~
                 </span>
-                ACADEMIC_RECORD
+                academic record
               </h3>
 
               <div className="mb-8">
@@ -199,7 +245,7 @@ const About = () => {
               </div>
 
               <div className="text-xs border-t border-dashed border-gray-300 pt-6 opacity-80 group-hover:opacity-100 transition-opacity">
-                <span className="block mb-3 uppercase tracking-widest font-bold">Relevant Coursework:</span>
+                <span className="block mb-3 font-crimson text-lg italic text-gray-500">Relevant Coursework:</span>
                 <div className="flex flex-wrap gap-x-4 gap-y-2">
                   {educationData.coursework.map((course, i) => (
                     <span key={i} className="hover:text-black hover:font-bold transition-all cursor-crosshair">
@@ -214,10 +260,17 @@ const About = () => {
         </div>
 
         {/* End of Section Log */}
-        <div className="py-12 font-mono text-xs text-center opacity-40 select-none">
-          {`+${'-'.repeat(30)}+`} <br />
-          {`|   END_OF_SECTION_LOG   |`} <br />
-          {`+${'-'.repeat(30)}+`}
+        {/* End of Section Log */}
+        <div className="pb-18 pt-18 font-mono text-xs opacity-40 select-none flex items-center justify-center overflow-hidden w-full">
+          <div className="flex-grow whitespace-nowrap text-right overflow-hidden">
+            {`"\`-._,-'`.repeat(20)}
+          </div>
+          <span className="mx-4 font-bold flex-shrink-0">
+            END_OF_SECTION_LOG
+          </span>
+          <div className="flex-grow whitespace-nowrap text-left overflow-hidden">
+            {`"\`-._,-'`.repeat(20)}
+          </div>
         </div>
 
       </div >

@@ -1,6 +1,7 @@
 // src/components/footer.jsx
 import React, { useState, useEffect } from 'react';
 import Icon from './icon';
+import { TECH_STACK_BG_ASCII } from '../assets/data/ascii';
 
 const Footer = () => {
   const [currentTime, setCurrentTime] = useState('');
@@ -40,14 +41,23 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer id="footer" className="bg-white text-black border-t border-black py-16 font-mono">
-      <div className="container max-w-7xl mx-auto px-6">
+    <footer id="footer" className="bg-white text-black border-t border-black py-16 font-mono relative overflow-hidden">
+      {/* Background ASCII Art */}
+      <div className="absolute top-0 left-0 w-[150%] h-full pointer-events-none select-none opacity-[0.10] overflow-hidden flex flex-wrap content-start z-0">
+        {Array.from({ length: 100 }).map((_, i) => (
+          <pre key={i} className="text-[10px] leading-[1.0] font-mono whitespace-pre text-black">
+            {TECH_STACK_BG_ASCII}
+          </pre>
+        ))}
+      </div>
+
+      <div className="container max-w-7xl mx-auto px-6 relative z-10">
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
           {/* Identity */}
           <div>
-            <div className="text-xs text-gray-500 uppercase tracking-widest mb-6 px-1 border-l-2 border-black">
-              // IDENTIFICATION
+            <div className="font-crimson text-sm italic text-gray-500 mb-6 px-1 border-l-2 border-black">
+              - identification
             </div>
             <h2 className="text-2xl font-bold uppercase tracking-tight mb-2">Anthony Hana</h2>
             <p className="text-sm opacity-70 mb-1">Mathematics & Computer Science</p>
@@ -56,8 +66,8 @@ const Footer = () => {
 
           {/* Status */}
           <div>
-            <div className="text-xs text-gray-500 uppercase tracking-widest mb-6 px-1 border-l-2 border-black">
-              // SYSTEM_STATUS
+            <div className="font-crimson text-sm italic text-gray-500 mb-6 px-1 border-l-2 border-black">
+              - system_status
             </div>
             <div className="flex items-center gap-3 mb-2">
               <span className="relative flex h-3 w-3">
@@ -78,8 +88,8 @@ const Footer = () => {
 
           {/* Connect */}
           <div>
-            <div className="text-xs text-gray-500 uppercase tracking-widest mb-6 px-1 border-l-2 border-black">
-              // CONNECT_UPLINK
+            <div className="font-crimson text-sm italic text-gray-500 mb-6 px-1 border-l-2 border-black">
+              - connect_uplink
             </div>
             <a
               href="mailto:anthonyhana04@gmail.com"

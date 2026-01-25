@@ -1,6 +1,7 @@
 import React from 'react';
 import useFadeOnScroll from '../hooks/useFadeOnScroll';
 import { projectsData } from '../assets/data/projectsData';
+import { PROJECTS_BG_ASCII } from '../assets/data/ascii';
 
 const Projects = () => {
   useFadeOnScroll('.project-item', {
@@ -9,17 +10,26 @@ const Projects = () => {
   })
 
   return (
-    <section id="experiences" className="projects-section bg-white text-black pb-24 pt-0">
-      <div className="container max-w-7xl mx-auto px-6">
+    <section id="experiences" className="projects-section bg-white text-black pb-0 pt-0 relative overflow-hidden">
+      {/* Background ASCII Art - Copied settings from profile_log */}
+      <div className="absolute top-0 left-0 w-[150%] h-full pointer-events-none select-none opacity-[0.10] overflow-hidden flex flex-wrap content-start z-0">
+        {Array.from({ length: 150 }).map((_, i) => (
+          <pre key={i} className="text-[10px] leading-[1.0] font-mono whitespace-pre text-black">
+            {PROJECTS_BG_ASCII}
+          </pre>
+        ))}
+      </div>
+
+      <div className="container max-w-7xl mx-auto px-6 relative z-10">
 
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 pb-6 border-b border-black">
           <div>
-            <span className="font-mono text-sm tracking-widest uppercase mb-2 block text-gray-500">
-              02 // SELECTED_WORK
+            <span className="font-crimson text-lg italic text-gray-500 mb-2 block">
+              02 - selected_work
             </span>
-            <h2 className="text-5xl md:text-6xl font-bold tracking-tighter uppercase font-mono">
-              FEATURED<span className="hidden md:inline">_</span>PROJECTS
+            <h2 className="text-5xl md:text-6xl font-bold font-crimson lowercase tracking-tight">
+              featured<span className="hidden md:inline">_</span>projects
             </h2>
           </div>
           <div className="mt-4 md:mt-0 font-mono text-sm">
@@ -78,12 +88,18 @@ const Projects = () => {
         </div>
 
         {/* Footer / ASCII decorative area */}
-        <div className="mt-16 font-mono text-xs text-center opacity-40">
-          {`+${'-'.repeat(30)}+`} <br />
-          {`|   END_OF_SECTION_LOG   |`} <br />
-          {`+${'-'.repeat(30)}+`}
+        {/* End of Section Log */}
+        <div className="pb-18 pt-18 font-mono text-xs opacity-40 select-none flex items-center justify-center overflow-hidden w-full">
+          <div className="flex-grow whitespace-nowrap text-right overflow-hidden">
+            {`"\`-._,-'`.repeat(20)}
+          </div>
+          <span className="mx-4 font-bold flex-shrink-0">
+            END_OF_SECTION_LOG
+          </span>
+          <div className="flex-grow whitespace-nowrap text-left overflow-hidden">
+            {`"\`-._,-'`.repeat(20)}
+          </div>
         </div>
-
       </div>
     </section>
   );

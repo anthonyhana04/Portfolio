@@ -1,4 +1,9 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+
+.font-crimson {
+  font-family: 'Crimson Pro', serif;
+}
 
 :root {
   --color-lb: #0084d1;
@@ -11,22 +16,53 @@
 
   --color-gray-1: #d1d5dc;
   --color-gray-2: #374151;
-  
+
 }
 
 /* global reset */
 
-*, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { margin: 0; font-family: 'Satoshi', sans-serif; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Satoshi', sans-serif;
+}
 
 /* scroll animation stuff */
 
-.fade-in-up{opacity:0;transform:translateY(30px);transition:all .6s ease-out}
-.fade-in-up.animate{opacity:1;transform:translateY(0);}
-.fade-in{opacity:0;transition:opacity .6s ease-out;}
-.fade-in.animate{opacity:1;}
-.fade-out-up {opacity: 0; transform: translateY(30px);}
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all .6s ease-out
+}
+
+.fade-in-up.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-in {
+  opacity: 0;
+  transition: opacity .6s ease-out;
+}
+
+.fade-in.animate {
+  opacity: 1;
+}
+
+.fade-out-up {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
 .animate-fade-in-up {
   opacity: 1;
   transform: translateY(0);
@@ -71,6 +107,7 @@ body { margin: 0; font-family: 'Satoshi', sans-serif; }
     opacity: 0.7;
     transform: scale(1);
   }
+
   100% {
     opacity: 1;
     transform: scale(1.05);
@@ -81,9 +118,11 @@ body { margin: 0; font-family: 'Satoshi', sans-serif; }
   .page-loader-circle {
     transition: transform 0.5s ease;
   }
+
   .page-loader-circle.slide-up {
     transform: translateY(-200vh);
   }
+
   .loader-text {
     animation: none;
   }
@@ -93,40 +132,36 @@ body { margin: 0; font-family: 'Satoshi', sans-serif; }
 
 .hero-bottom-blur {
   position: absolute;
-  inset-inline: 0;    
+  inset-inline: 0;
   bottom: 0;
-  height: 8rem;     
+  height: 8rem;
   pointer-events: none;
   z-index: 20;
 
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0)    0%,
-    rgba(255,255,255,0.05) 10%,
-    rgba(255,255,255,0.1)  20%,
-    rgba(255,255,255,0.2)  35%,
-    rgba(255,255,255,0.35) 50%,
-    rgba(255,255,255,0.5)  65%,
-    rgba(255,255,255,0.7)  80%,
-    rgba(255,255,255,0.85) 90%,
-    rgba(255,255,255,1)    100%
-  );
+  background: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.05) 10%,
+      rgba(255, 255, 255, 0.1) 20%,
+      rgba(255, 255, 255, 0.2) 35%,
+      rgba(255, 255, 255, 0.35) 50%,
+      rgba(255, 255, 255, 0.5) 65%,
+      rgba(255, 255, 255, 0.7) 80%,
+      rgba(255, 255, 255, 0.85) 90%,
+      rgba(255, 255, 255, 1) 100%);
 
   backdrop-filter: blur(1px);
   -webkit-backdrop-filter: blur(1px);
 }
 
 .hero-line {
-  background: linear-gradient(
-    to right,
-    #5e58cd,   
-    #9e89f8,  
-    #9c98c2   
-  );
-  background-size: 100%;       
-  background-clip: text;          
+  background: linear-gradient(to right,
+      #5e58cd,
+      #9e89f8,
+      #9c98c2);
+  background-size: 100%;
+  background-clip: text;
   -webkit-background-clip: text;
-  color: transparent;            
+  color: transparent;
 }
 
 .hero-line .letter {
