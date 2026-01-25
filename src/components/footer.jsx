@@ -4,18 +4,34 @@ import Icon from './icon';
 
 const Footer = () => {
   const [currentTime, setCurrentTime] = useState('');
+  const [isOnline, setIsOnline] = useState(true);
 
   // my timezone (EST)
   useEffect(() => {
     const updateTime = () => {
-      const time = new Date().toLocaleTimeString('en-CA', {
+      const now = new Date();
+
+      // format time for display
+      const timeDisplay = now.toLocaleTimeString('en-CA', {
         timeZone: 'America/Toronto',
-        hour12: true,
+        hour12: false,
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit'
       });
-      setCurrentTime(time);
+      setCurrentTime(timeDisplay);
+
+      // check online status (10pm - 9am est = offline)
+      const hourString = now.toLocaleTimeString('en-US', {
+        timeZone: 'America/Toronto',
+        hour: 'numeric',
+        hour12: false
+      });
+
+      const hour = parseInt(hourString, 10);
+      // Offline if hour is 22, 23, 0, 1, ... 8
+      const isOffline = hour >= 22 || hour < 9;
+      setIsOnline(!isOffline);
     };
 
     updateTime();
@@ -24,54 +40,90 @@ const Footer = () => {
   }, []);
 
   return (
-    <section id="footer" className="bg-[#1d1d1d] text-(--color-gray-1) pt-22 pb-8">
-      <div className="max-w-7xl mx-auto px-8 lg:px-6 md:px-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-medium m-0">Anthony Hana</h2>
-          <p className="font-mono text-sm m-0">{currentTime} EST (GMT-5)</p>
-        </div>
-        <div className="h-px bg-gray-300 mb-6" /> {/* line divider */}
-        <div className="flex justify-between items-start">
-          <div className="text-sm leading-relaxed max-w-md">
-            <p className="mb-2">Mathematics & Computer Science Student</p>
-            <p className="mb-0">McMaster University – Hamilton, Ontario, Canada</p>
+    <footer id="footer" className="bg-white text-black border-t border-black py-16 font-mono">
+      <div className="container max-w-7xl mx-auto px-6">
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+          {/* Identity */}
+          <div>
+            <div className="text-xs text-gray-500 uppercase tracking-widest mb-6 px-1 border-l-2 border-black">
+              // IDENTIFICATION
+            </div>
+            <h2 className="text-2xl font-bold uppercase tracking-tight mb-2">Anthony Hana</h2>
+            <p className="text-sm opacity-70 mb-1">Mathematics & Computer Science</p>
+            <p className="text-sm opacity-70">McMaster University</p>
           </div>
-          <div className="flex flex-col items-end gap-4">
-            <a href="mailto:anthonyhana04@gmail.com" className="text-sm hover:text-gray-400">
-              anthonyhana04@gmail.com
+
+          {/* Status */}
+          <div>
+            <div className="text-xs text-gray-500 uppercase tracking-widest mb-6 px-1 border-l-2 border-black">
+              // SYSTEM_STATUS
+            </div>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="relative flex h-3 w-3">
+                {isOnline && (
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                )}
+                <span className={`relative inline-flex rounded-full h-3 w-3 ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}></span>
+              </span>
+              <span className="text-sm font-bold">{isOnline ? 'ONLINE' : 'OFFLINE'}</span>
+            </div>
+            <div className="text-3xl font-bold tracking-tighter mb-1">
+              {currentTime}<span className="text-sm font-normal text-gray-400 ml-2">EST</span>
+            </div>
+            <div className="text-xs opacity-50 uppercase">
+              LOC: Hamilton, ON, CA
+            </div>
+          </div>
+
+          {/* Connect */}
+          <div>
+            <div className="text-xs text-gray-500 uppercase tracking-widest mb-6 px-1 border-l-2 border-black">
+              // CONNECT_UPLINK
+            </div>
+            <a
+              href="mailto:anthonyhana04@gmail.com"
+              className="block text-lg hover:underline decoration-1 underline-offset-4 mb-6 hover:translate-x-1 transition-transform duration-200"
+            >
+              anthonyhana04@gmail.com ↗
             </a>
-            <div className="flex gap-4">
-              <a
-                href="https://instagram.com/anthony.hana"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-              >
-                <Icon name="instagram" size={24} color="#E1306C" />
-              </a>
 
-              <a
-                href="https://linkedin.com/in/anthony-hana-797a3a208/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-              >
-                <Icon name="linkedin" size={24} color="#0084d1" />
-              </a>
-
-              <a
-                href="https://github.com/anthonyhana04"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="GitHub"
-              >
-                <Icon name="github" size={24} color="#d1d5dc" />
-              </a>
+            <div className="flex gap-6">
+              {[
+                { name: 'github', link: 'https://github.com/anthonyhana04' },
+                { name: 'linkedin', link: 'https://linkedin.com/in/anthony-hana-797a3a208/' },
+                { name: 'instagram', link: 'https://instagram.com/anthony.hana' }
+              ].map((social) => (
+                <a
+                  key={social.name}
+                  href={social.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative items-center justify-center p-2 border border-black hover:bg-black hover:text-white transition-colors duration-300"
+                  aria-label={social.name}
+                >
+                  <Icon name={social.name} size={20} color="currentColor" />
+                </a>
+              ))}
             </div>
           </div>
         </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-dashed border-gray-400 pt-8 flex flex-col md:flex-row justify-between items-center text-xs opacity-60 uppercase tracking-wider gap-4">
+          <div>
+            © {new Date().getFullYear()} ANTHONY_HANA_PORTFOLIO
+          </div>
+          <div className="hidden md:block">
+            {`[ END_OF_TRANSMISSION ]`}
+          </div>
+          <div>
+            BUILT_WITH_REACT
+          </div>
+        </div>
+
       </div>
-    </section>
+    </footer>
   );
 };
 
