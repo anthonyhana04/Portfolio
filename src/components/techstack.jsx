@@ -18,7 +18,7 @@ const TechStack = () => {
   const [isGridHovered, setIsGridHovered] = useState(false);
 
   return (
-    <section id="techstack" className="relative bg-white text-black py-0 overflow-hidden">
+    <section id="techstack" className="relative bg-white text-black py-0 overflow-hidden pb-24">
       {/* Background ASCII Art */}
       <div className="absolute top-0 left-0 w-[150%] h-full pointer-events-none select-none opacity-[0.10] overflow-hidden flex flex-wrap content-start z-0">
         {Array.from({ length: 150 }).map((_, i) => (
@@ -122,8 +122,8 @@ const TechStack = () => {
                 ))}
               </ul>
 
-              <div className="relative z-10 mt-8 pt-4 border-t border-dashed border-gray-400 group-hover:border-white/30 text-[10px] font-mono opacity-50">
-                MODULE_LOADED
+              <div className="relative z-10 mt-8 pt-4 lowercase border-t border-dashed border-gray-400 group-hover:border-white/30 text-[10px] font-mono opacity-50">
+
               </div>
             </div>
           ))}

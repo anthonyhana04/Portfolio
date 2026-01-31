@@ -32,8 +32,16 @@ const Projects = () => {
               featured<span className="hidden md:inline">_</span>projects
             </h2>
           </div>
-          <div className="mt-4 md:mt-0 font-mono text-sm">
-            [ {projectsData.length} ITEMS DETECTED ]
+          <div className="mt-4 md:mt-0 font-mono text-sm flex flex-col md:items-end gap-2">
+            <div>[ {projectsData.length} ITEMS DETECTED ]</div>
+            <a
+              href="https://github.com/anthonyhana04?tab=repositories"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-gray-500 hover:text-black hover:underline underline-offset-4 transition-colors lowercase flex items-center gap-1"
+            >
+              view_more_projects <span>↗</span>
+            </a>
           </div>
         </div>
 
@@ -93,8 +101,8 @@ const Projects = () => {
           <div className="flex-grow whitespace-nowrap text-right overflow-hidden">
             {`"\`-._,-'`.repeat(20)}
           </div>
-          <span className="mx-4 font-bold flex-shrink-0">
-            END_OF_SECTION_LOG
+          <span className="mx-4 font-bold lowercase flex-shrink-0">
+            [ end_of_section ]
           </span>
           <div className="flex-grow whitespace-nowrap text-left overflow-hidden">
             {`"\`-._,-'`.repeat(20)}

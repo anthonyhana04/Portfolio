@@ -41,7 +41,7 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer id="footer" className="bg-white text-black border-t border-black py-16 font-mono relative overflow-hidden">
+    <footer id="footer" className="bg-white text-black py-16 font-mono relative overflow-hidden">
       {/* Background ASCII Art */}
       <div className="absolute top-0 left-0 w-[150%] h-full pointer-events-none select-none opacity-[0.10] overflow-hidden flex flex-wrap content-start z-0">
         {Array.from({ length: 100 }).map((_, i) => (
@@ -57,7 +57,6 @@ const Footer = () => {
           {/* Identity */}
           <div>
             <div className="font-crimson text-sm italic text-gray-500 mb-6 px-1 border-l-2 border-black">
-              - identification
             </div>
             <h2 className="text-2xl font-bold uppercase tracking-tight mb-2">Anthony Hana</h2>
             <p className="text-sm opacity-70 mb-1">Mathematics & Computer Science</p>
@@ -67,7 +66,6 @@ const Footer = () => {
           {/* Status */}
           <div>
             <div className="font-crimson text-sm italic text-gray-500 mb-6 px-1 border-l-2 border-black">
-              - system_status
             </div>
             <div className="flex items-center gap-3 mb-2">
               <span className="relative flex h-3 w-3">
@@ -89,7 +87,6 @@ const Footer = () => {
           {/* Connect */}
           <div>
             <div className="font-crimson text-sm italic text-gray-500 mb-6 px-1 border-l-2 border-black">
-              - connect_uplink
             </div>
             <a
               href="mailto:anthonyhana04@gmail.com"
@@ -102,7 +99,8 @@ const Footer = () => {
               {[
                 { name: 'github', link: 'https://github.com/anthonyhana04' },
                 { name: 'linkedin', link: 'https://linkedin.com/in/anthony-hana-797a3a208/' },
-                { name: 'instagram', link: 'https://instagram.com/anthony.hana' }
+                { name: 'instagram', link: 'https://instagram.com/anthony.hana' },
+                { name: 'discord', link: 'https://discord.com/users/an.1' }
               ].map((social) => (
                 <a
                   key={social.name}
@@ -121,14 +119,14 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="border-t border-dashed border-gray-400 pt-8 flex flex-col md:flex-row justify-between items-center text-xs opacity-60 uppercase tracking-wider gap-4">
-          <div>
-            © {new Date().getFullYear()} ANTHONY_HANA_PORTFOLIO
+          <div className="hidden lowercase md:block">
+            anthony_hana_portfolio
           </div>
-          <div className="hidden md:block">
-            {`[ END_OF_TRANSMISSION ]`}
+          <div className="hidden lowercase md:block">
+            {`[ end_of_page ]`}
           </div>
-          <div>
-            BUILT_WITH_REACT
+          <div className="hidden lowercase md:block">
+            built_with_react
           </div>
         </div>
 

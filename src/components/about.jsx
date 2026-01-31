@@ -55,7 +55,7 @@ const About = () => {
 
 
   return (
-    <section id="about" className="bg-white text-black pt-24 pb-0 font-mono border-t border-black relative overflow-hidden">
+    <section id="about" className="bg-white text-black pt-24 pb-0 font-mono relative overflow-hidden">
       {/* Background ASCII Art */}
       <div className="absolute top-0 left-0 w-[150%] h-full pointer-events-none select-none opacity-[0.10] overflow-hidden flex flex-wrap content-start z-0">
         {Array.from({ length: 150 }).map((_, i) => (
@@ -265,8 +265,8 @@ const About = () => {
           <div className="flex-grow whitespace-nowrap text-right overflow-hidden">
             {`"\`-._,-'`.repeat(20)}
           </div>
-          <span className="mx-4 font-bold flex-shrink-0">
-            END_OF_SECTION_LOG
+          <span className="mx-4 font-bold lowercase flex-shrink-0">
+            [ end_of_section ]
           </span>
           <div className="flex-grow whitespace-nowrap text-left overflow-hidden">
             {`"\`-._,-'`.repeat(20)}
