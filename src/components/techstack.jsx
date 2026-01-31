@@ -1,126 +1,136 @@
-// src/components/TechStack.jsx
-import React from 'react';
-import Icon from '../components/icon';
+import React, { useState } from 'react';
+import useFadeOnScroll from '../hooks/useFadeOnScroll';
+import { LANGUAGES_BG_ASCII, FRAMEWORKS_BG_ASCII, INFRASTRUCTURE_BG_ASCII, TOOLS_BG_ASCII, TECH_STACK_BG_ASCII } from '../assets/data/ascii';
+import { TerminalIcon } from '../assets/data/icons';
 
-// data
-const techData = {
-  languages: ['JavaScript', 'Python', 'Swift', 'ELM', 'C++', 'SQL', 'R', 'Haskell'],
-  frameworks: ['React', 'Node.js', 'Flask', 'Tailwind CSS', 'PyTorch', 'Pandas', 'Numpy', 'Scikit-learn'],
-  technologies: ['Jira', 'PostgreSQL', 'GCP', 'Docker', 'AWS', 'Git/GitHub', 'ESLint'],
-  devTools: ['Overleaf', 'Figma', 'DBeaver', 'NetBeans', 'Jupyter', 'RStudio', 'Intellij']
-};
+const techItems = [
+  { category: "LANGUAGES", items: ["Typescript", "Haskell", "Python", "Go", "C++", "Swift"] },
+  { category: "FRAMEWORKS", items: ["React", "Next.js", "Tailwind", "Pandas", "Angular", "TensorFlow", "PyTorch"] },
+  { category: "INFRASTRUCTURE", items: ["Docker", "Kubernetes", "AWS", "Terraform", "PostgreSQL", "ClickHouse", "Redis"] },
+  { category: "TOOLS", items: ["Git", "Postman", "Antigravity", "Docker", "Kafka", "DBeaver"] }
+];
 
-// map disp -> icon
-const iconKeyMap = {
-  'JavaScript': 'javascript',
-  'Python': 'python',
-  'Swift': 'swift',
-  'ELM': 'elm',
-  'C++': 'cplusplus',
-  'SQL': 'sql',
-  'R': 'r',
-  'Haskell': 'haskell',
+const TechStack = () => {
+  useFadeOnScroll('.tech-category', {
+    threshold: 0.1,
+  });
 
-  'React': 'react',
-  'Node.js': 'nodejs',
-  'Flask': 'flask',
-  'Tailwind CSS': 'tailwind',
-  'PyTorch': 'pytorch',
-  'Pandas': 'pandas',
-  'Scikit-learn': 'scikit-learn',
-  'Numpy': 'numpy',
+  const [isGridHovered, setIsGridHovered] = useState(false);
 
-  'Jira': 'jira',
-  'PostgreSQL': 'postgresql',
-  'GCP': 'googlecloud',
-  'Docker': 'docker',
-  'AWS': 'aws',
-  'ESLint': 'eslint',
-  'Git/GitHub': 'github',
-
-  'Overleaf': 'overleaf',
-  'Figma': 'figma',
-  'DBeaver': 'dbeaver',
-  'RStudio': 'rstudio',
-  'Intellij': 'intellij',
-  'NetBeans': 'netbeans',
-  'Jupyter': 'jupyter'
-};
-
-const TechStack = () => (
-  <section id="techstack" className="py-20 pb-40 relative">
-    <div className="container mx-auto px-8 lg:px-6">
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-bold text-gray-900">Tech Stack</h2>
-        <p className="text-gray-600 mt-2">Tools & technologies I work with</p>
+  return (
+    <section id="techstack" className="relative bg-white text-black py-0 overflow-hidden pb-24">
+      {/* Background ASCII Art */}
+      <div className="absolute top-0 left-0 w-[150%] h-full pointer-events-none select-none opacity-[0.10] overflow-hidden flex flex-wrap content-start z-0">
+        {Array.from({ length: 150 }).map((_, i) => (
+          <pre key={i} className="text-[10px] leading-[1.0] font-mono whitespace-pre text-black">
+            {TECH_STACK_BG_ASCII}
+          </pre>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-        {Object.entries(techData).map(([key, items]) => {
-          const title =
-            key === 'devTools' ? 'Developer Tools' : key.charAt(0).toUpperCase() + key.slice(1);
-          
-          return (
-            <div
-              key={key}
-              className="relative bg-white rounded-2xl p-6 overflow-hidden hover:shadow-xl transition-shadow duration-200"
-            >
-              <span
-                className={`absolute left-0 top-0 h-2 w-16 bg-${
-                  key === 'languages'
-                    ? 'indigo'
-                    : key === 'frameworks'
-                    ? 'emerald'
-                    : key === 'technologies'
-                    ? 'amber'
-                    : 'rose'
-                }-500`}
-              />
+      <div className="container max-w-7xl mx-auto px-6 relative z-10">
 
-              <h3 className="relative text-2xl font-semibold text-gray-800 mb-4">
-                {title}
+        {/* Header */}
+        <div className="mb-16 border-b border-black pb-6">
+          <div className="flex justify-between items-end">
+            <div>
+              <span className="font-crimson text-lg italic text-gray-500 mb-2 block">
+                03 - system_capabilities
+              </span>
+              <h2 className="text-5xl md:text-6xl font-bold font-crimson lowercase tracking-tight">
+                tech<span className="hidden md:inline">_</span>stack
+              </h2>
+            </div>
+            <div className={`hidden md:block transition-all duration-300 ${isGridHovered ? 'text-green-500 drop-shadow-[0_0_15px_rgba(34,197,94,0.6)]' : 'text-black'}`}>
+              <TerminalIcon />
+            </div>
+          </div>
+        </div>
+
+        {/* Tech Grid */}
+        <div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-l border-t border-black"
+          onMouseEnter={() => setIsGridHovered(true)}
+          onMouseLeave={() => setIsGridHovered(false)}
+        >
+          {techItems.map((group, idx) => (
+            <div
+              key={group.category}
+              className="tech-category relative border-r border-b border-black p-8 hover:bg-black hover:text-white transition-colors duration-300 group min-h-[300px] flex flex-col overflow-hidden"
+            >
+              {/* ASCII Art Background for LANGUAGES */}
+              {group.category === "LANGUAGES" && (
+                <div className="absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none select-none">
+                  <div className="absolute -top-10 -left-10 w-[150%] h-[150%] flex flex-wrap content-start">
+                    {Array.from({ length: 12 }).map((_, i) => (
+                      <pre key={i} className="text-[10px] leading-[1.0] font-mono text-white whitespace-pre">
+                        {LANGUAGES_BG_ASCII}
+                      </pre>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ASCII Art Background for FRAMEWORKS */}
+              {group.category === "FRAMEWORKS" && (
+                <div className="absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none select-none">
+                  <div className="absolute -top-10 -left-10 w-[150%] h-[150%] flex flex-wrap content-start">
+                    {Array.from({ length: 12 }).map((_, i) => (
+                      <pre key={i} className="text-[10px] leading-[1.0] font-mono text-white whitespace-pre">
+                        {FRAMEWORKS_BG_ASCII}
+                      </pre>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ASCII Art Background for INFRASTRUCTURE */}
+              {group.category === "INFRASTRUCTURE" && (
+                <div className="absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none select-none">
+                  <div className="absolute -top-10 -left-10 w-[150%] h-[150%] flex flex-wrap content-start">
+                    {Array.from({ length: 12 }).map((_, i) => (
+                      <pre key={i} className="text-[10px] leading-[1.0] font-mono text-white whitespace-pre">
+                        {INFRASTRUCTURE_BG_ASCII}
+                      </pre>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ASCII Art Background for TOOLS */}
+              {group.category === "TOOLS" && (
+                <div className="absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none select-none">
+                  <div className="absolute -top-10 -left-10 w-[150%] h-[150%] flex flex-wrap content-start">
+                    {Array.from({ length: 12 }).map((_, i) => (
+                      <pre key={i} className="text-[10px] leading-[1.0] font-mono text-white whitespace-pre">
+                        {TOOLS_BG_ASCII}
+                      </pre>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <h3 className="relative z-10 font-mono text-sm font-bold mb-8 uppercase tracking-widest border-b border-black group-hover:border-white pb-2">
+                [{idx + 1}] {group.category}
               </h3>
 
-              <div className="flex flex-wrap gap-6">
-                {items.map((name) => {
-                  const iconKey = iconKeyMap[name] || 'file';
-                  return (
-                    <div key={name} className="flex flex-col items-center w-24 group">
-                      <Icon
-                        name={iconKey}
-                        size={48}
-                        color="currentColor"
-                        className="mb-2"
-                      />
-                      <span className="text-sm text-gray-700 text-center">{name}</span>
-                    </div>
-                  );
-                })}
+              <ul className="relative z-10 flex-grow flex flex-col gap-4">
+                {group.items.map((item) => (
+                  <li key={item} className="font-mono text-lg flex items-center">
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="relative z-10 mt-8 pt-4 lowercase border-t border-dashed border-gray-400 group-hover:border-white/30 text-[10px] font-mono opacity-50">
+
               </div>
             </div>
-          );
-        })}
-      </div>
-
-      {/* banner overlapping the bottom of techstack */}
-      <div className="absolute inset-x-0 bottom-0 transform translate-y-1/2 flex justify-center z-20">
-        <div className="max-w-6xl w-full mx-auto bg-gradient-to-r from-(--color-p) to-(--color-lp) rounded-xl p-6 flex flex-col md:flex-row items-center justify-between text-white shadow-lg">
-          <div className="text-center md:text-left mb-4 md:mb-0">
-            <h2 className="text-2xl md:text-3xl font-bold">Let's Work Together!</h2>
-            <p className="text-base opacity-90">
-              Send me a quick message to discuss future opportunities.
-            </p>
-          </div>
-          <a
-            href="mailto:anthonyhana04@gmail.com"
-            className="inline-block px-6 py-2 border border-white rounded-lg font-medium text-white hover:bg-white hover:text-indigo-500 transition"
-          >
-            Send Email
-          </a>
+          ))}
         </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export default TechStack;

@@ -5,31 +5,34 @@ export const projectsData = [
   {
     id: 1,
     title: "AI & ML Engineer",
-    description: "Engineering high-throughput AI systems for autonomous email marketing at LTV.ai. I implement & optimize LLM prompting strategies and implement response caching with async orchestration to scale email generation, while building analytics dashboards that power insights across high-volume client datasets.",
-    image: assets['ltvai-logo.jpg'],
-    imagescale: "scale-100",
+    description: "Engineering high-throughput AI systems for autonomous email marketing at LTV.ai. Orchestrating LLM prompting strategies and async response caching to scale generation.",
     tech: ["TypeScript", "PostgreSQL", "AWS", "LLMOps"],
-    githubUrl: "https://ltv.ai/",
-    category: "Work Experience"
+    link: "https://ltv.ai/",
+    type: "Work"
   },
   {
     id: 2,
-    title: "Software Architect", 
-    description: "As Software Architect at McMaster Start Coding, I'll design, build, and maintain internal engineering tools and workflows, establish coding standards and CI/CD pipelines, and plan and lead hands-on workshops to empower students and mentors.",
-    image: assets['msclogo.jpg'],
-    imagescale: "scale-10",
-    tech: ["Elm", "Haskell", "Python", "PostgreSQL"],
-    category: "Voluenteer"
+    title: "MacPad",
+    description: "Feather‑light, all‑native notepad designed exclusively for macOS. Built with SwiftUI for a modern interface and AppKit for rock‑solid integration.",
+    tech: ["Swift", "AppKit", "SwiftUI"],
+    link: "https://github.com/anthonyhana04/MacPad",
+    type: "Project"
   },
   {
     id: 3,
-    title: "MacPad",
-    description: "MacPad is a feather‑light, all‑native notepad designed exclusively for macOS. Built with SwiftUI for a seamless modern interface and AppKit under the hood for rock‑solid integration, MacPad delivers a refreshingly simple yet powerful writing experience",  
-    image: assets['macpad.jpg'],
-    imagescale: "scale-100",
-    tech: ["Swift", "AppKit", "SwiftUI", "Swift Concurrency"],
-    githubUrl: "https://github.com/anthonyhana04/MacPad",
-    category: "Text Editor"
+    title: "Software Architect",
+    description: "Designing internal tools and CI/CD pipelines for McMaster Start Coding. Leading workshops to empower students with industry-standard development practices.",
+    tech: ["Elm", "Haskell", "JavaScript", "CI/CD"],
+    type: "Volunteer"
+  },
+  {
+    id: 4,
+    title: "LavaLock",
+    description: "Leverages the chaotic entropy of lava lamps and Google Gemini's API to generate distinct visual variations. These are cryptographically processed to derive secure, unpredictable seeds for 2FA and password generation.",
+    tech: ["Go", "C++", "Swift", "AWS", "PostgreSQL"],
+    link: "https://github.com/anthonyhana04/LavaLock_DH_XII",
+    award: "DeltaHacks XII Winner",
+    type: "Project"
   }
 ];
 
@@ -45,8 +48,8 @@ export const getProjectsByCategory = (category) => {
 
 // grab proj tech
 export const getProjectsByTech = (technology) => {
-  return projectsData.filter(project => 
-    project.tech.some(tech => 
+  return projectsData.filter(project =>
+    project.tech.some(tech =>
       tech.toLowerCase().includes(technology.toLowerCase())
     )
   );
