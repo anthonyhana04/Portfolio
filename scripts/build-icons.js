@@ -37,6 +37,7 @@ import {
   siDocker,
   siGithub,
   siInstagram,
+  siDiscord,
   siEslint,
 } from 'simple-icons/icons';
 
@@ -73,6 +74,7 @@ const iconExports = {
   docker: siDocker,
   github: siGithub,
   instagram: siInstagram,
+  discord: siDiscord,
   
   // these dont exist on simpleicon
   file: {

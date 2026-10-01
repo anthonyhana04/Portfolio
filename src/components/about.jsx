@@ -212,13 +212,13 @@ const About = () => {
               </h3>
               <div className="text-sm md:text-base leading-relaxed opacity-80 space-y-6">
                 <p>
-                  I’m Anthony, a software engineer passionate about building systems that are fast and reliable, but also intuitive and user-centered. With a curious mind and a love for learning, I aim to turn complex challenges into clean, scalable solutions.
+                  I’m Anthony, a software engineer passionate about building systems that are fast, reliable, and intuitive. With a curious mind and a love for learning, I enjoy turning complex problems into clean, scalable solutions.
                 </p>
                 <p>
-                  Whether it's exploring new cities on Google Maps or implementing high-throughput AI systems at LTV.ai, I am driven by exploration and optimization.
+                  Whether I’m exploring a new city on Google Maps, learning Spanish, or building software at McMaster, I’m driven by exploration, creativity, and optimization.
                 </p>
                 <p>
-                  My background spans machine learning, full-stack development, and software architecture, honed through hackathons, internships, and leading cross-functional teams.
+                  My background spans machine learning, full-stack development, and software architecture, shaped through internships, hackathons, and building products from the ground up.
                 </p>
               </div>
             </div>
