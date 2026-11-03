@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <clipPath id="r"><rect width="64" height="64" rx="14"/></clipPath>
+    <linearGradient id="top" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a5d3b"/>
+      <stop offset="1" stop-color="#6b4429"/>
+    </linearGradient>
+    <linearGradient id="bottom" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f1e7d6"/>
+      <stop offset="1" stop-color="#d9cbb3"/>
+    </linearGradient>
+    <radialGradient id="ring" cx="0.5" cy="0.35" r="0.7">
+      <stop offset="0" stop-color="#f4f4f4"/>
+      <stop offset="1" stop-color="#8d8d8d"/>
+    </radialGradient>
+    <radialGradient id="glass" cx="0.4" cy="0.35" r="0.75">
+      <stop offset="0" stop-color="#3f6fa8"/>
+      <stop offset="0.6" stop-color="#14263f"/>
+      <stop offset="1" stop-color="#05080d"/>
+    </radialGradient>
+  </defs>
+  <g clip-path="url(#r)">
+    <!-- leather top + cream bottom -->
+    <rect width="64" height="64" fill="url(#bottom)"/>
+    <rect width="64" height="27" fill="url(#top)"/>
+    <rect y="26" width="64" height="1.5" fill="#4a2e1b" opacity="0.6"/>
+    <!-- rainbow stripe -->
+    <rect x="8" width="3" height="26.5" fill="#e23b3b"/>
+    <rect x="11" width="3" height="26.5" fill="#f4c12f"/>
+    <rect x="14" width="3" height="26.5" fill="#4fb146"/>
+    <rect x="17" width="3" height="26.5" fill="#3b7fd6"/>
+    <!-- viewfinder -->
+    <rect x="43" y="8" width="12" height="10" rx="2.5" fill="#1b1b1b" stroke="#c9c9c9" stroke-width="1.6"/>
+    <rect x="45.5" y="10" width="4" height="3" rx="1" fill="#5d7fa6" opacity="0.8"/>
+    <!-- lens -->
+    <circle cx="32" cy="34" r="16" fill="url(#ring)"/>
+    <circle cx="32" cy="34" r="13" fill="#1a1a1a"/>
+    <circle cx="32" cy="34" r="10" fill="url(#glass)"/>
+    <ellipse cx="28.5" cy="30" rx="3.2" ry="2.2" fill="#ffffff" opacity="0.55"/>
+  </g>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="#000" stroke-opacity="0.25"/>
+</svg>
