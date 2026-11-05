@@ -1,15 +1,9 @@
 import { hash3, lerp } from '../lib/math'
-import type { Pt } from '../lib/math'
 
 /**
- * Optional pond decorations, kept separate from the koi so they're easy to
- * switch off (see the flags in components/KoiPond.tsx) or delete outright.
+ * Contour lines: marching squares over a slowly drifting noise field, so the
+ * background reads like a topographic map of the pond floor.
  */
-
-// ---------------------------------------------------------------------------
-// Contour lines: marching squares over a slowly drifting noise field, so the
-// background reads like a topographic map of the pond floor.
-// ---------------------------------------------------------------------------
 
 function valueNoise(x: number, y: number) {
   const xi = Math.floor(x), yi = Math.floor(y)
@@ -53,7 +47,7 @@ export function drawContours(g: CanvasRenderingContext2D, w: number, h: number, 
         const segs = CASES[idx]
         if (!segs.length) continue
         const x0 = x * STEP, y0 = y * STEP
-        const edge = (e: number): Pt => {
+        const edge = (e: number) => {
           switch (e) {
             case 0: return { x: x0 + STEP * ((L - a) / (b - a)), y: y0 }
             case 1: return { x: x0 + STEP, y: y0 + STEP * ((L - b) / (c - b)) }

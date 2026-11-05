@@ -3,24 +3,17 @@ import { startAscii } from '../lib/ascii'
 import { clamp } from '../lib/math'
 import { createKoiPond } from '../scenes/koi'
 
-const KOI_RAMP = ' .,:;~=+*xoO0#@'
-
-// Pond extras — flip any of these to false to remove it (code lives in scenes/pondDecor.ts)
-const POND_FEATURES = {
-  contours: true,
-  rain: true,
-}
-
 /** Fixed full-screen ASCII koi pond that sits behind all page content. */
-export default function KoiPond({ reducedMotion = false }: { reducedMotion?: boolean }) {
+export default function KoiPond() {
   const ref = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     const canvas = ref.current
     if (!canvas) return
-    const pond = createKoiPond({ speed: reducedMotion ? 0.35 : 1, ...POND_FEATURES })
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const pond = createKoiPond(reducedMotion ? 0.35 : 1)
     const stop = startAscii(canvas, pond, {
-      ramp: KOI_RAMP,
+      ramp: ' .,:;~=+*xoO0#@',
       fps: reducedMotion ? 15 : 30,
       glow: 0.35,
       ripple: 2, // travelling wave that swaps characters as the koi swim through it
@@ -40,7 +33,7 @@ export default function KoiPond({ reducedMotion = false }: { reducedMotion?: boo
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerdown', onDown)
     }
-  }, [reducedMotion])
+  }, [])
 
   return (
     <canvas

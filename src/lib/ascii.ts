@@ -9,6 +9,13 @@ import { clamp, hash3 } from './math'
  * follows the pixel's brightness. Black pixels are left empty.
  */
 
+const BACKGROUND = '#0a0a0a'
+/** How often (Hz) individual glyphs randomly flicker to a neighbouring character. */
+const FLICKER_HZ = 8
+
+/** Lifts a colour channel by k, then quantises it to keep the style cache small. */
+const tone = (channel: number, k: number) => Math.min(255, (channel * k) | 0) & 0xf8
+
 export interface Frame {
   /** Seconds since the renderer started. */
   t: number
@@ -20,38 +27,28 @@ export interface Frame {
 }
 
 export interface Scene {
-  resize?(w: number, h: number): void
+  resize(w: number, h: number): void
   draw(g: CanvasRenderingContext2D, f: Frame): void
 }
 
 export interface AsciiOptions {
   /** Glyphs from sparse to dense. Index 0 is never drawn. */
-  ramp?: string
-  fps?: number
+  ramp: string
+  fps: number
   /** Font size in px for a given viewport. */
-  fontSize?: (w: number, h: number) => number
-  /** Opacity of the blurred colour bloom drawn under the glyphs (0 = off). */
-  glow?: number
-  /** Solid background colour of the visible canvas. */
-  background?: string
+  fontSize: (w: number, h: number) => number
+  /** Opacity of the blurred colour bloom drawn under the glyphs. */
+  glow: number
   /** How many ramp steps a travelling wave shifts glyphs by (makes motion "shimmer"). */
-  ripple?: number
-  /** How often (Hz) individual glyphs randomly flicker to a neighbouring character. */
-  flicker?: number
+  ripple: number
 }
 
-const DEFAULT_RAMP = ' .:-=+*cxoaX#%&@'
-
 /** Starts rendering `scene` into `canvas`. Returns a cleanup function. */
-export function startAscii(canvas: HTMLCanvasElement, scene: Scene, opts: AsciiOptions = {}): () => void {
-  const ramp = opts.ramp ?? DEFAULT_RAMP
-  const fps = opts.fps ?? 30
-  const glow = opts.glow ?? 0.4
-  const background = opts.background ?? '#0a0a0a'
-  const ripple = opts.ripple ?? 0
-  const flicker = opts.flicker ?? 8
-  const fontFor = opts.fontSize ?? ((w, h) => clamp(Math.floor(Math.min(w / 100, h / 80)), 6, 12))
-
+export function startAscii(
+  canvas: HTMLCanvasElement,
+  scene: Scene,
+  { ramp, fps, fontSize, glow, ripple }: AsciiOptions,
+): () => void {
   const ctx = canvas.getContext('2d')
   const off = document.createElement('canvas')
   const g = off.getContext('2d', { willReadFrequently: true })
@@ -71,14 +68,14 @@ export function startAscii(canvas: HTMLCanvasElement, scene: Scene, opts: AsciiO
     return s
   }
 
-  function resize() {
+  const resize = () => {
     dpr = Math.min(window.devicePixelRatio || 1, 2)
     w = window.innerWidth
     h = window.innerHeight
-    const fs = fontFor(w, h)
+    const fs = fontSize(w, h)
     font = `bold ${fs}px ui-monospace, Menlo, Consolas, "DejaVu Sans Mono", monospace`
-    ctx!.font = font
-    cellW = ctx!.measureText('M').width || fs * 0.6
+    ctx.font = font
+    cellW = ctx.measureText('M').width || fs * 0.6
     cellH = fs
     canvas.width = Math.floor(w * dpr)
     canvas.height = Math.floor(h * dpr)
@@ -86,37 +83,35 @@ export function startAscii(canvas: HTMLCanvasElement, scene: Scene, opts: AsciiO
     rows = Math.ceil(h / cellH)
     off.width = cols
     off.height = rows
-    scene.resize?.(w, h)
+    scene.resize(w, h)
   }
 
-  function render(t: number, dt: number) {
+  const render = (t: number, dt: number) => {
     // 1. let the scene paint in CSS pixels; the transform squashes it into cell space
-    g!.setTransform(1, 0, 0, 1, 0, 0)
-    g!.fillStyle = '#000'
-    g!.fillRect(0, 0, cols, rows)
-    g!.setTransform(1 / cellW, 0, 0, 1 / cellH, 0, 0)
-    scene.draw(g!, { t, dt, w, h })
-    const data = g!.getImageData(0, 0, cols, rows).data
+    g.setTransform(1, 0, 0, 1, 0, 0)
+    g.fillStyle = '#000'
+    g.fillRect(0, 0, cols, rows)
+    g.setTransform(1 / cellW, 0, 0, 1 / cellH, 0, 0)
+    scene.draw(g, { t, dt, w, h })
+    const data = g.getImageData(0, 0, cols, rows).data
 
     // 2. background + soft colour bloom
-    ctx!.setTransform(dpr, 0, 0, dpr, 0, 0)
-    ctx!.fillStyle = background
-    ctx!.fillRect(0, 0, w, h)
-    if (glow > 0) {
-      ctx!.save()
-      ctx!.globalAlpha = glow
-      ctx!.globalCompositeOperation = 'lighter'
-      ctx!.filter = `blur(${Math.round(cellH * 0.5)}px)`
-      ctx!.imageSmoothingEnabled = true
-      ctx!.drawImage(off, 0, 0, cols * cellW, rows * cellH)
-      ctx!.restore()
-    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    ctx.fillStyle = BACKGROUND
+    ctx.fillRect(0, 0, w, h)
+    ctx.save()
+    ctx.globalAlpha = glow
+    ctx.globalCompositeOperation = 'lighter'
+    ctx.filter = `blur(${Math.round(cellH * 0.5)}px)`
+    ctx.imageSmoothingEnabled = true
+    ctx.drawImage(off, 0, 0, cols * cellW, rows * cellH)
+    ctx.restore()
 
     // 3. glyphs
-    ctx!.font = font
-    ctx!.textBaseline = 'top'
+    ctx.font = font
+    ctx.textBaseline = 'top'
     const n = ramp.length - 1
-    const flick = Math.floor(t * flicker)
+    const flick = Math.floor(t * FLICKER_HZ)
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
         const i = (y * cols + x) * 4
@@ -127,17 +122,13 @@ export function startAscii(canvas: HTMLCanvasElement, scene: Scene, opts: AsciiO
         const v = m / 255
         const hs = hash3(x, y, flick)
         const jitter = hs % 7 === 0 ? (hs & 8 ? 1 : -1) : 0
-        const wave = ripple ? Math.round(Math.sin(x * 0.45 - y * 0.3 + t * 6) * ripple) : 0
+        const wave = Math.round(Math.sin(x * 0.45 - y * 0.3 + t * 6) * ripple)
         const idx = clamp(Math.round(Math.pow(v, 0.7) * n) + jitter + wave, 1, n)
 
-        // lift dim colours so glyphs stay legible, and quantise to keep the style cache small
+        // lift dim colours so glyphs stay legible
         const k = Math.min(1.25, (40 + 215 * v) / m)
-        ctx!.fillStyle = style(
-          Math.min(255, (r * k) | 0) & 0xf8,
-          Math.min(255, (gr * k) | 0) & 0xf8,
-          Math.min(255, (b * k) | 0) & 0xf8,
-        )
-        ctx!.fillText(ramp[idx], x * cellW, y * cellH)
+        ctx.fillStyle = style(tone(r, k), tone(gr, k), tone(b, k))
+        ctx.fillText(ramp[idx], x * cellW, y * cellH)
       }
     }
   }

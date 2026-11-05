@@ -1,7 +1,7 @@
 import type { Scene } from '../lib/ascii'
 import { angleDiff, clamp, lerp, TAU } from '../lib/math'
 import type { Pt } from '../lib/math'
-import { drawContours } from './pondDecor'
+import { drawContours } from './contours'
 
 /**
  * Background koi pond. Each fish is a chain of spine points that follows its
@@ -12,25 +12,17 @@ import { drawContours } from './pondDecor'
 
 const SEGMENTS = 16
 const RIM_WIDTH = 9
-
-interface Spot {
-  at: number // 0 = nose, 1 = tail base
-  side: number // -1..1 across the body
-  r: number // fraction of body width
-}
+const DOT_AT = 0.3 // where the yin-yang dot sits along the body (0 = nose, 1 = tail base)
 
 interface Variety {
   body: string
-  spot: string
+  dot: string
   fin: string
   /** Outline drawn around the body. */
   rim?: string
-  spots: Spot[]
 }
 
-interface Koi {
-  x: number
-  y: number
+interface Koi extends Pt {
   heading: number
   speed: number
   cruise: number
@@ -44,9 +36,7 @@ interface Koi {
   variety: Variety
 }
 
-interface Ripple {
-  x: number
-  y: number
+interface Ripple extends Pt {
   born: number
   strength: number
 }
@@ -56,19 +46,8 @@ const rand = (a: number, b: number) => a + Math.random() * (b - a)
 // Yin and yang: each fish carries a single dot of the other's colour. The ASCII
 // renderer leaves black pixels empty, so the black koi needs a rim to be seen
 // against the dark page.
-const WHITE_KOI: Variety = {
-  body: '#ece8e0',
-  spot: '#000000',
-  fin: 'rgba(235,232,225,0.62)',
-  spots: [{ at: 0.3, side: 0, r: 0.5 }],
-}
-const BLACK_KOI: Variety = {
-  body: '#000000',
-  spot: '#ece8e0',
-  fin: 'rgba(150,150,150,0.7)',
-  rim: '#a8a8a8',
-  spots: [{ at: 0.3, side: 0, r: 0.5 }],
-}
+const WHITE_KOI: Variety = { body: '#ece8e0', dot: '#000000', fin: 'rgba(235,232,225,0.62)' }
+const BLACK_KOI: Variety = { body: '#000000', dot: '#ece8e0', fin: 'rgba(150,150,150,0.7)', rim: '#a8a8a8' }
 
 function spawn(w: number, h: number, variety: Variety): Koi {
   const len = clamp(Math.min(w, h) * 0.3, 150, 300) * rand(0.8, 1.1)
@@ -98,27 +77,89 @@ function bodyWidth(f: number) {
   return 1 - Math.pow((f - 0.22) / 0.78, 1.6) * 0.82
 }
 
-export interface KoiScene extends Scene {
+/** 1 when p is right on top of k, falling to 0 at `radius` and beyond. */
+const closeness = (k: Koi, p: Pt, radius: number) => Math.max(0, 1 - Math.hypot(k.x - p.x, k.y - p.y) / radius)
+
+/** The turn that would point k directly away from p. */
+const turnAway = (k: Koi, p: Pt) => angleDiff(Math.atan2(k.y - p.y, k.x - p.x), k.heading)
+
+/** Spine point i with the swimming undulation applied, plus the local direction. */
+function bodyPoint(k: Koi, i: number) {
+  const a = k.spine[Math.max(0, i - 1)]
+  const b = k.spine[Math.min(SEGMENTS - 1, i + 1)]
+  const ang = Math.atan2(a.y - b.y, a.x - b.x)
+  const f = i / (SEGMENTS - 1)
+  const amp = k.width * 0.55 * Math.pow(f, 1.6) * (1 + k.fright * 0.6)
+  const off = Math.sin(k.phase - f * 4.2) * amp
+  const p = k.spine[i]
+  return { x: p.x - Math.sin(ang) * off, y: p.y + Math.cos(ang) * off, ang }
+}
+
+function fin(g: CanvasRenderingContext2D, x: number, y: number, ang: number, rx: number, ry: number) {
+  g.beginPath()
+  g.ellipse(x + Math.cos(ang) * rx * 0.8, y + Math.sin(ang) * rx * 0.8, rx, ry, ang, 0, TAU)
+  g.fill()
+}
+
+function drawKoi(g: CanvasRenderingContext2D, k: Koi) {
+  const pts = Array.from({ length: SEGMENTS }, (_, i) => bodyPoint(k, i))
+
+  // pectoral + pelvic fins (paddle gently, faster when frightened)
+  g.fillStyle = k.variety.fin
+  const paddle = Math.sin(k.phase * 0.5) * 0.35
+  for (const [i, size, base] of [[3, 1.1, 1.0], [8, 0.6, 1.2]] as const) {
+    const p = pts[i]
+    for (const side of [-1, 1]) {
+      // angle measured from "pointing backwards", splayed out to each side
+      const ang = p.ang + Math.PI - side * (base + paddle)
+      const nx = p.x + Math.cos(p.ang + side * Math.PI / 2) * k.width * 0.7
+      const ny = p.y + Math.sin(p.ang + side * Math.PI / 2) * k.width * 0.7
+      fin(g, nx, ny, ang, k.width * size, k.width * size * 0.38)
+    }
+  }
+
+  // tail: two flowing lobes that lag the body wave
+  const tail = pts[SEGMENTS - 1]
+  const flick = Math.sin(k.phase - 4.6) * 0.45
+  for (const side of [-1, 1]) {
+    fin(g, tail.x, tail.y, tail.ang + Math.PI + side * 0.42 + flick, k.width * 1.5, k.width * 0.5)
+  }
+
+  /** A filled circle on the spine, at fraction f along the body. */
+  const disc = (f: number, r: number) => {
+    const at = f * (SEGMENTS - 1)
+    const i = Math.floor(at)
+    const a = pts[i], b = pts[i + 1]
+    g.beginPath()
+    g.arc(lerp(a.x, b.x, at - i), lerp(a.y, b.y, at - i), r, 0, TAU)
+    g.fill()
+  }
+
+  // body: overlapping discs along the spine (two per segment for smoothness)
+  const fillBody = (color: string, grow: number) => {
+    const count = (SEGMENTS - 1) * 2
+    g.fillStyle = color
+    for (let s = 0; s < count; s++) disc(s / count, k.width * bodyWidth(s / count) + grow)
+  }
+  if (k.variety.rim) fillBody(k.variety.rim, RIM_WIDTH)
+  fillBody(k.variety.body, 0)
+
+  g.fillStyle = k.variety.dot
+  disc(DOT_AT, k.width * bodyWidth(DOT_AT) * 0.5)
+}
+
+interface KoiScene extends Scene {
   pointer(x: number, y: number): void
   splash(x: number, y: number): void
 }
 
-export interface PondOptions {
-  speed?: number
-  /** Topographic contour lines on the pond floor. */
-  contours?: boolean
-  /** Occasional small raindrop ripples. */
-  rain?: boolean
-}
-
-export function createKoiPond(opts: PondOptions = {}): KoiScene {
-  const speedScale = opts.speed ?? 1
-  let nextDrop = 2
+export function createKoiPond(speedScale: number): KoiScene {
   let fish: Koi[] = []
   let ripples: Ripple[] = []
   let W = 0, H = 0, now = 0
   let mouse: Pt | null = null
   let nextSurface = 3
+  let nextDrop = 2
 
   function step(k: Koi, dt: number, t: number) {
     // smooth wander made from two slow sines, unique per fish
@@ -134,22 +175,14 @@ export function createKoiPond(opts: PondOptions = {}): KoiScene {
 
     // personal space
     for (const o of fish) {
-      if (o === k) continue
-      const dx = k.x - o.x, dy = k.y - o.y
-      const d = Math.hypot(dx, dy)
-      if (d < k.len * 0.7 && d > 0.01) {
-        turn += angleDiff(Math.atan2(dy, dx), k.heading) * (1 - d / (k.len * 0.7)) * 0.8
-      }
+      if (o !== k) turn += turnAway(k, o) * closeness(k, o, k.len * 0.7) * 0.8
     }
 
     // dart away from the cursor
     if (mouse) {
-      const dx = k.x - mouse.x, dy = k.y - mouse.y
-      const d = Math.hypot(dx, dy)
-      if (d < 170) {
-        turn += angleDiff(Math.atan2(dy, dx), k.heading) * (1 - d / 170) * 3
-        k.fright = Math.max(k.fright, (1 - d / 170) * 0.8)
-      }
+      const near = closeness(k, mouse, 170)
+      turn += turnAway(k, mouse) * near * 3
+      k.fright = Math.max(k.fright, near * 0.8)
     }
 
     k.fright = Math.max(0, k.fright - dt * 0.6)
@@ -170,82 +203,6 @@ export function createKoiPond(opts: PondOptions = {}): KoiScene {
     }
   }
 
-  /** Spine point i with the swimming undulation applied, plus the local direction. */
-  function bodyPoint(k: Koi, i: number) {
-    const a = k.spine[Math.max(0, i - 1)]
-    const b = k.spine[Math.min(SEGMENTS - 1, i + 1)]
-    const ang = Math.atan2(a.y - b.y, a.x - b.x)
-    const f = i / (SEGMENTS - 1)
-    const amp = k.width * 0.55 * Math.pow(f, 1.6) * (1 + k.fright * 0.6)
-    const off = Math.sin(k.phase - f * 4.2) * amp
-    const p = k.spine[i]
-    return { x: p.x - Math.sin(ang) * off, y: p.y + Math.cos(ang) * off, ang }
-  }
-
-  function fin(g: CanvasRenderingContext2D, x: number, y: number, ang: number, rx: number, ry: number, color: string) {
-    g.fillStyle = color
-    g.beginPath()
-    g.ellipse(x + Math.cos(ang) * rx * 0.8, y + Math.sin(ang) * rx * 0.8, rx, ry, ang, 0, TAU)
-    g.fill()
-  }
-
-  function drawKoi(g: CanvasRenderingContext2D, k: Koi) {
-    const pts = Array.from({ length: SEGMENTS }, (_, i) => bodyPoint(k, i))
-    const finColor = k.variety.fin
-
-    // pectoral + pelvic fins (paddle gently, faster when frightened)
-    const paddle = Math.sin(k.phase * 0.5) * 0.35
-    for (const [i, size, base] of [[3, 1.1, 1.0], [8, 0.6, 1.2]] as const) {
-      const p = pts[i]
-      for (const side of [-1, 1]) {
-        // angle measured from "pointing backwards", splayed out to each side
-        const ang = p.ang + Math.PI - side * (base + paddle)
-        const nx = p.x + Math.cos(p.ang + side * Math.PI / 2) * k.width * 0.7
-        const ny = p.y + Math.sin(p.ang + side * Math.PI / 2) * k.width * 0.7
-        fin(g, nx, ny, ang, k.width * size, k.width * size * 0.38, finColor)
-      }
-    }
-
-    // tail: two flowing lobes that lag the body wave
-    const tail = pts[SEGMENTS - 1]
-    const flick = Math.sin(k.phase - 4.6) * 0.45
-    for (const side of [-1, 1]) {
-      fin(g, tail.x, tail.y, tail.ang + Math.PI + side * 0.42 + flick, k.width * 1.5, k.width * 0.5, finColor)
-    }
-
-    // body: overlapping circles along the spine (two per segment for smoothness)
-    const fillBody = (color: string, grow: number) => {
-      g.fillStyle = color
-      for (let i = 0; i < SEGMENTS - 1; i++) {
-        for (let h = 0; h < 2; h++) {
-          const a = pts[i], b = pts[i + 1]
-          const x = lerp(a.x, b.x, h / 2), y = lerp(a.y, b.y, h / 2)
-          const r = k.width * bodyWidth((i + h / 2) / (SEGMENTS - 1)) + grow
-          g.beginPath()
-          g.arc(x, y, r, 0, TAU)
-          g.fill()
-        }
-      }
-    }
-    if (k.variety.rim) fillBody(k.variety.rim, RIM_WIDTH)
-    fillBody(k.variety.body, 0)
-
-    // markings
-    g.fillStyle = k.variety.spot
-    for (const s of k.variety.spots) {
-      const fi = s.at * (SEGMENTS - 1)
-      const i = Math.floor(fi)
-      const a = pts[i], b = pts[Math.min(SEGMENTS - 1, i + 1)]
-      const x = lerp(a.x, b.x, fi - i), y = lerp(a.y, b.y, fi - i)
-      const bw = k.width * bodyWidth(s.at)
-      const px = x + Math.cos(a.ang + Math.PI / 2) * s.side * bw * 0.5
-      const py = y + Math.sin(a.ang + Math.PI / 2) * s.side * bw * 0.5
-      g.beginPath()
-      g.arc(px, py, bw * s.r, 0, TAU)
-      g.fill()
-    }
-  }
-
   function drawRipples(g: CanvasRenderingContext2D) {
     ripples = ripples.filter((r) => now - r.born < 2.4)
     for (const r of ripples) {
@@ -253,9 +210,7 @@ export function createKoiPond(opts: PondOptions = {}): KoiScene {
       for (let ring = 0; ring < 3; ring++) {
         const a = age - ring * 0.25
         if (a <= 0) continue
-        const alpha = (1 - a / 2.4) * 0.5 * r.strength
-        if (alpha <= 0) continue
-        g.strokeStyle = `rgba(120,200,255,${alpha})`
+        g.strokeStyle = `rgba(120,200,255,${(1 - a / 2.4) * 0.5 * r.strength})`
         g.lineWidth = 3
         g.beginPath()
         g.arc(r.x, r.y, a * 110 * r.strength, 0, TAU)
@@ -266,15 +221,12 @@ export function createKoiPond(opts: PondOptions = {}): KoiScene {
 
   return {
     resize(w, h) {
-      const first = W === 0
       W = w
       H = h
-      if (first) fish = [spawn(w, h, WHITE_KOI), spawn(w, h, BLACK_KOI)]
-      else {
-        for (const k of fish) {
-          k.x = clamp(k.x, 0, w)
-          k.y = clamp(k.y, 0, h)
-        }
+      if (!fish.length) fish = [spawn(w, h, WHITE_KOI), spawn(w, h, BLACK_KOI)]
+      for (const k of fish) {
+        k.x = clamp(k.x, 0, w)
+        k.y = clamp(k.y, 0, h)
       }
     },
     pointer(x, y) {
@@ -295,18 +247,18 @@ export function createKoiPond(opts: PondOptions = {}): KoiScene {
       for (const k of fish) step(k, dt, t)
 
       // now and then a fish nudges the surface
-      if (t > nextSurface && fish.length) {
+      if (t > nextSurface) {
         const k = fish[Math.floor(Math.random() * fish.length)]
         ripples.push({ x: k.x, y: k.y, born: t, strength: 0.45 })
         nextSurface = t + rand(5, 10)
       }
       // and the odd raindrop
-      if (opts.rain && t > nextDrop) {
+      if (t > nextDrop) {
         ripples.push({ x: rand(0, w), y: rand(0, h), born: t, strength: rand(0.2, 0.35) })
         nextDrop = t + rand(1.5, 4)
       }
 
-      if (opts.contours) drawContours(g, w, h, t)
+      drawContours(g, w, h, t)
       drawRipples(g)
       for (const k of fish) drawKoi(g, k)
     },

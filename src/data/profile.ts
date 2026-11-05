@@ -32,9 +32,9 @@ export interface Social {
   color: string
 }
 
-/** A photo in the strip near the bottom of the page. Leave `src` empty for a placeholder. */
+/** A photo in the strip near the bottom of the page. */
 export interface Photo {
-  src?: string
+  src: string
   alt: string
 }
 
@@ -42,8 +42,8 @@ export interface Photo {
 export interface Role {
   title: string
   org: string
-  detail?: string
-  logo?: string
+  detail: string
+  logo: string
   href?: string
 }
 
@@ -53,8 +53,8 @@ export interface Project {
   year: string
   description: string
   tech: string[]
-  href?: string
-  image?: string
+  href: string
+  image: string
   /** CSS object-position for the preview image, e.g. 'top' to keep the top edge. Default: center. */
   imagePosition?: string
   /** CSS background shown behind the preview image (useful for transparent PNGs), e.g. '#fff'. */
@@ -77,12 +77,7 @@ export const profile = {
     { label: 'LinkedIn', glyph: 'in', href: 'https://linkedin.com/in/anthony-hana-797a3a208/', color: '#0A66C2' },
     { label: 'GitHub', icon: siGithub.path, href: 'https://github.com/anthonyhana04', color: '#000000' },
     { label: 'Discord', icon: siDiscord.path, href: 'https://discord.com/users/an.1', color: '#5865F2' },
-    {
-      label: 'Instagram',
-      image: instagramClassic, // the classic 2010-era camera icon
-      href: 'https://instagram.com/anthony.hana',
-      color: '#6b4429',
-    },
+    { label: 'Instagram', image: instagramClassic, href: 'https://instagram.com/anthony.hana', color: '#6b4429' },
   ] satisfies Social[],
 
   now: [
@@ -97,15 +92,9 @@ export const profile = {
 
   // Photo strip above the footer. To add one: put a web-sized copy in src/assets/images/
   // (e.g. `sips -Z 1200 -s format jpeg photo.JPG --out photo-web.jpg`),
-  // import it at the top of this file, and set it as `src` below.
+  // import it at the top of this file, and add it to the list below.
   photoCaption: "a few frames from places i've wandered ✿",
-  photos: [
-    { src: frame1, alt: 'Photo by Anthony Hana' },
-    { src: frame2, alt: 'Photo by Anthony Hana' },
-    { src: frame3, alt: 'Photo by Anthony Hana' },
-    { src: frame4, alt: 'Photo by Anthony Hana' },
-    { src: frame5, alt: 'Photo by Anthony Hana' },
-  ] satisfies Photo[],
+  photos: [frame1, frame2, frame3, frame4, frame5].map((src) => ({ src, alt: 'Photo by Anthony Hana' })) satisfies Photo[],
 
   projects: [
     {

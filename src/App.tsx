@@ -4,13 +4,10 @@ import Reveal from './components/Reveal'
 import { ProjectCard, RoleList, SectionLabel, SocialChips } from './components/Sections'
 import { profile } from './data/profile'
 
-const reducedMotion =
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
 export default function App() {
   return (
     <>
-      <KoiPond reducedMotion={reducedMotion} />
+      <KoiPond />
 
       <main className="mx-auto w-full max-w-5xl px-4 [text-shadow:0_0_12px_#0a0a0a,0_0_4px_#0a0a0a] pt-12 pb-24 md:pt-24 lg:pt-32">
         <Reveal index={0}>
