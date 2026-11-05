@@ -7,10 +7,8 @@ const KOI_RAMP = ' .,:;~=+*xoO0#@'
 
 // Pond extras — flip any of these to false to remove it (code lives in scenes/pondDecor.ts)
 const POND_FEATURES = {
-  lilyPads: true,
   contours: true,
   rain: true,
-  ducks: true,
 }
 
 /** Fixed full-screen ASCII koi pond that sits behind all page content. */

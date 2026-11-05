@@ -1,7 +1,7 @@
 import type { Scene } from '../lib/ascii'
 import { angleDiff, clamp, lerp, TAU } from '../lib/math'
 import type { Pt } from '../lib/math'
-import { createDucks, createLilyPads, drawContours } from './pondDecor'
+import { drawContours } from './pondDecor'
 
 /**
  * Background koi pond. Each fish is a chain of spine points that follows its
@@ -11,6 +11,7 @@ import { createDucks, createLilyPads, drawContours } from './pondDecor'
  */
 
 const SEGMENTS = 16
+const RIM_WIDTH = 9
 
 interface Spot {
   at: number // 0 = nose, 1 = tail base
@@ -21,6 +22,9 @@ interface Spot {
 interface Variety {
   body: string
   spot: string
+  fin: string
+  /** Outline drawn around the body. */
+  rim?: string
   spots: Spot[]
 }
 
@@ -49,23 +53,24 @@ interface Ripple {
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a)
 
-function randomVariety(): Variety {
-  const kind = Math.floor(Math.random() * 4)
-  const scatter = (n: number, near = 0): Spot[] =>
-    Array.from({ length: n }, () => ({ at: clamp(near + rand(0, 0.75), 0.05, 0.85), side: rand(-0.6, 0.6), r: rand(0.35, 0.65) }))
-  switch (kind) {
-    case 0: // kohaku: white with red-orange patches
-      return { body: '#ece8e0', spot: '#f0582c', spots: scatter(5) }
-    case 1: // tancho: white with a single red crown
-      return { body: '#efece6', spot: '#e8402c', spots: [{ at: 0.1, side: 0, r: 0.6 }] }
-    case 2: // ogon: solid metallic gold
-      return { body: '#f2b04b', spot: '#ffd27a', spots: scatter(2) }
-    default: // orange with white patches
-      return { body: '#ff8a3d', spot: '#f5efe6', spots: scatter(4, 0.1) }
-  }
+// Yin and yang: each fish carries a single dot of the other's colour. The ASCII
+// renderer leaves black pixels empty, so the black koi needs a rim to be seen
+// against the dark page.
+const WHITE_KOI: Variety = {
+  body: '#ece8e0',
+  spot: '#000000',
+  fin: 'rgba(235,232,225,0.62)',
+  spots: [{ at: 0.3, side: 0, r: 0.5 }],
+}
+const BLACK_KOI: Variety = {
+  body: '#000000',
+  spot: '#ece8e0',
+  fin: 'rgba(150,150,150,0.7)',
+  rim: '#a8a8a8',
+  spots: [{ at: 0.3, side: 0, r: 0.5 }],
 }
 
-function spawn(w: number, h: number): Koi {
+function spawn(w: number, h: number, variety: Variety): Koi {
   const len = clamp(Math.min(w, h) * 0.3, 150, 300) * rand(0.8, 1.1)
   const heading = rand(0, TAU)
   const x = rand(w * 0.15, w * 0.85)
@@ -83,7 +88,7 @@ function spawn(w: number, h: number): Koi {
     phase: rand(0, TAU),
     seed: rand(0, 100),
     fright: 0,
-    variety: randomVariety(),
+    variety,
   }
 }
 
@@ -100,20 +105,14 @@ export interface KoiScene extends Scene {
 
 export interface PondOptions {
   speed?: number
-  /** Drifting lily pads that koi swim under. */
-  lilyPads?: boolean
   /** Topographic contour lines on the pond floor. */
   contours?: boolean
   /** Occasional small raindrop ripples. */
   rain?: boolean
-  /** A few small rubber ducks floating on the surface. */
-  ducks?: boolean
 }
 
 export function createKoiPond(opts: PondOptions = {}): KoiScene {
   const speedScale = opts.speed ?? 1
-  const pads = opts.lilyPads ? createLilyPads() : null
-  const ducks = opts.ducks ? createDucks() : null
   let nextDrop = 2
   let fish: Koi[] = []
   let ripples: Ripple[] = []
@@ -192,7 +191,7 @@ export function createKoiPond(opts: PondOptions = {}): KoiScene {
 
   function drawKoi(g: CanvasRenderingContext2D, k: Koi) {
     const pts = Array.from({ length: SEGMENTS }, (_, i) => bodyPoint(k, i))
-    const finColor = 'rgba(235,232,225,0.62)'
+    const finColor = k.variety.fin
 
     // pectoral + pelvic fins (paddle gently, faster when frightened)
     const paddle = Math.sin(k.phase * 0.5) * 0.35
@@ -215,17 +214,21 @@ export function createKoiPond(opts: PondOptions = {}): KoiScene {
     }
 
     // body: overlapping circles along the spine (two per segment for smoothness)
-    g.fillStyle = k.variety.body
-    for (let i = 0; i < SEGMENTS - 1; i++) {
-      for (let h = 0; h < 2; h++) {
-        const a = pts[i], b = pts[i + 1]
-        const x = lerp(a.x, b.x, h / 2), y = lerp(a.y, b.y, h / 2)
-        const r = k.width * bodyWidth((i + h / 2) / (SEGMENTS - 1))
-        g.beginPath()
-        g.arc(x, y, r, 0, TAU)
-        g.fill()
+    const fillBody = (color: string, grow: number) => {
+      g.fillStyle = color
+      for (let i = 0; i < SEGMENTS - 1; i++) {
+        for (let h = 0; h < 2; h++) {
+          const a = pts[i], b = pts[i + 1]
+          const x = lerp(a.x, b.x, h / 2), y = lerp(a.y, b.y, h / 2)
+          const r = k.width * bodyWidth((i + h / 2) / (SEGMENTS - 1)) + grow
+          g.beginPath()
+          g.arc(x, y, r, 0, TAU)
+          g.fill()
+        }
       }
     }
+    if (k.variety.rim) fillBody(k.variety.rim, RIM_WIDTH)
+    fillBody(k.variety.body, 0)
 
     // markings
     g.fillStyle = k.variety.spot
@@ -241,16 +244,6 @@ export function createKoiPond(opts: PondOptions = {}): KoiScene {
       g.arc(px, py, bw * s.r, 0, TAU)
       g.fill()
     }
-  }
-
-  /** How much a ripple ring currently passing under (x, y) lifts whatever floats there (0..1). */
-  function bob(x: number, y: number) {
-    let lift = 0
-    for (const r of ripples) {
-      const ring = (now - r.born) * 110 * r.strength
-      lift = Math.max(lift, Math.max(0, 1 - Math.abs(Math.hypot(x - r.x, y - r.y) - ring) / 40) * r.strength)
-    }
-    return lift
   }
 
   function drawRipples(g: CanvasRenderingContext2D) {
@@ -273,16 +266,11 @@ export function createKoiPond(opts: PondOptions = {}): KoiScene {
 
   return {
     resize(w, h) {
-      pads?.resize(w, h)
-      ducks?.resize(w, h)
       const first = W === 0
       W = w
       H = h
-      const count = w < 640 ? 2 : w < 1200 ? 3 : 4
-      if (first) fish = Array.from({ length: count }, () => spawn(w, h))
+      if (first) fish = [spawn(w, h, WHITE_KOI), spawn(w, h, BLACK_KOI)]
       else {
-        while (fish.length < count) fish.push(spawn(w, h))
-        fish.length = Math.min(fish.length, count)
         for (const k of fish) {
           k.x = clamp(k.x, 0, w)
           k.y = clamp(k.y, 0, h)
@@ -294,7 +282,6 @@ export function createKoiPond(opts: PondOptions = {}): KoiScene {
     },
     splash(x, y) {
       ripples.push({ x, y, born: now, strength: 1 })
-      ducks?.splash(x, y)
       for (const k of fish) {
         const d = Math.hypot(k.x - x, k.y - y)
         if (d < 320) {
@@ -322,22 +309,6 @@ export function createKoiPond(opts: PondOptions = {}): KoiScene {
       if (opts.contours) drawContours(g, w, h, t)
       drawRipples(g)
       for (const k of fish) drawKoi(g, k)
-
-      if (pads) {
-        for (const k of fish) {
-          pads.push(k, { x: Math.cos(k.heading) * k.speed, y: Math.sin(k.heading) * k.speed }, k.width, dt)
-        }
-        pads.step(dt)
-        pads.draw(g, bob)
-      }
-
-      if (ducks) {
-        for (const k of fish) {
-          ducks.push(k, { x: Math.cos(k.heading) * k.speed, y: Math.sin(k.heading) * k.speed }, k.width, dt)
-        }
-        ducks.step(dt, t)
-        ducks.draw(g, t, bob)
-      }
     },
   }
 }

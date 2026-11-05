@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import BloomIntro from './components/BloomIntro'
 import KoiPond from './components/KoiPond'
 import PhotoStrip from './components/PhotoStrip'
 import Reveal from './components/Reveal'
@@ -8,20 +6,14 @@ import { profile } from './data/profile'
 
 const reducedMotion =
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-// ?intro=0 skips the bloom (handy while developing)
-const skipIntro = reducedMotion || new URLSearchParams(window.location.search).get('intro') === '0'
 
 export default function App() {
-  const [introMounted, setIntroMounted] = useState(!skipIntro)
-  const [revealed, setRevealed] = useState(skipIntro)
-
   return (
     <>
       <KoiPond reducedMotion={reducedMotion} />
-      {introMounted && <BloomIntro onReveal={() => setRevealed(true)} onDone={() => setIntroMounted(false)} />}
 
       <main className="mx-auto w-full max-w-5xl px-4 [text-shadow:0_0_12px_#0a0a0a,0_0_4px_#0a0a0a] pt-12 pb-24 md:pt-24 lg:pt-32">
-        <Reveal show={revealed} index={0}>
+        <Reveal index={0}>
           <header className="flex items-center gap-4">
             <img
               src={profile.photo}
@@ -49,31 +41,31 @@ export default function App() {
         </Reveal>
 
         <div className="mt-8 flex flex-col gap-8">
-          <Reveal show={revealed} index={1}>
+          <Reveal index={1}>
             <SectionLabel>Now</SectionLabel>
             <RoleList roles={profile.now} />
           </Reveal>
-          <Reveal show={revealed} index={2}>
+          <Reveal index={2}>
             <SectionLabel>Previously</SectionLabel>
             <RoleList roles={profile.previously} />
           </Reveal>
         </div>
 
         <section className="mt-16">
-          <Reveal show={revealed} index={3}>
+          <Reveal index={3}>
             <h2 className="text-xl font-medium">Engineering</h2>
             <p className="mb-6 text-sm text-muted">Where I&apos;ve been and things I&apos;ve shipped.</p>
           </Reveal>
           <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2">
             {profile.projects.map((p, i) => (
-              <Reveal key={p.name} show={revealed} index={4 + i}>
+              <Reveal key={p.name} index={4 + i}>
                 <ProjectCard p={p} />
               </Reveal>
             ))}
           </div>
         </section>
 
-        <Reveal show={revealed} index={4 + profile.projects.length}>
+        <Reveal index={4 + profile.projects.length}>
           <section aria-label="Photos" className="mt-16">
             <PhotoStrip photos={profile.photos} />
             <p className="mt-4 text-center font-mono text-xs text-muted">
@@ -82,7 +74,7 @@ export default function App() {
           </section>
         </Reveal>
 
-        <Reveal show={revealed} index={5 + profile.projects.length}>
+        <Reveal index={5 + profile.projects.length}>
           <footer className="mt-12 flex flex-col items-start gap-2 border-t border-line pt-8">
             <p className="text-muted">Want to say hi?</p>
             <a href={`mailto:${profile.email}`} className="group text-lg font-medium">

@@ -19,14 +19,9 @@ export interface Frame {
   h: number
 }
 
-export interface FrameResult {
-  /** 0→1: fraction of glyphs to randomly drop this frame (for dissolve-out). */
-  dissolve?: number
-}
-
 export interface Scene {
   resize?(w: number, h: number): void
-  draw(g: CanvasRenderingContext2D, f: Frame): FrameResult | void
+  draw(g: CanvasRenderingContext2D, f: Frame): void
 }
 
 export interface AsciiOptions {
@@ -43,8 +38,6 @@ export interface AsciiOptions {
   ripple?: number
   /** How often (Hz) individual glyphs randomly flicker to a neighbouring character. */
   flicker?: number
-  /** Start the clock this many seconds in (for previewing a specific moment). */
-  startAt?: number
 }
 
 const DEFAULT_RAMP = ' .:-=+*cxoaX#%&@'
@@ -102,8 +95,7 @@ export function startAscii(canvas: HTMLCanvasElement, scene: Scene, opts: AsciiO
     g!.fillStyle = '#000'
     g!.fillRect(0, 0, cols, rows)
     g!.setTransform(1 / cellW, 0, 0, 1 / cellH, 0, 0)
-    const res = scene.draw(g!, { t, dt, w, h }) || {}
-    const dissolve = res.dissolve ?? 0
+    scene.draw(g!, { t, dt, w, h })
     const data = g!.getImageData(0, 0, cols, rows).data
 
     // 2. background + soft colour bloom
@@ -112,7 +104,7 @@ export function startAscii(canvas: HTMLCanvasElement, scene: Scene, opts: AsciiO
     ctx!.fillRect(0, 0, w, h)
     if (glow > 0) {
       ctx!.save()
-      ctx!.globalAlpha = glow * (1 - dissolve)
+      ctx!.globalAlpha = glow
       ctx!.globalCompositeOperation = 'lighter'
       ctx!.filter = `blur(${Math.round(cellH * 0.5)}px)`
       ctx!.imageSmoothingEnabled = true
@@ -131,7 +123,6 @@ export function startAscii(canvas: HTMLCanvasElement, scene: Scene, opts: AsciiO
         const r = data[i], gr = data[i + 1], b = data[i + 2]
         const m = Math.max(r, gr, b)
         if (m < 14) continue
-        if (dissolve > 0 && (hash3(x, y, 7) % 1000) / 1000 < dissolve) continue
 
         const v = m / 255
         const hs = hash3(x, y, flick)
@@ -153,8 +144,8 @@ export function startAscii(canvas: HTMLCanvasElement, scene: Scene, opts: AsciiO
 
   let raf = 0
   let last = 0
-  let prevT = opts.startAt ?? 0
-  const start = performance.now() - (opts.startAt ?? 0) * 1000
+  let prevT = 0
+  const start = performance.now()
   const frame = (now: number) => {
     raf = requestAnimationFrame(frame)
     if (now - last < 1000 / fps - 1) return

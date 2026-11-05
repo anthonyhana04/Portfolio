@@ -10,6 +10,15 @@
   --color-muted: #9da0a3;
   --color-surface: #141414;
   --color-line: #262626;
+
+  --animate-reveal: reveal 700ms ease-out both;
+
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(2rem);
+    }
+  }
 }
 
 html {
